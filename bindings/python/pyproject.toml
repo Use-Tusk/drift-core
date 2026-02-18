@@ -1,0 +1,9 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "drift-core-python"
+version = "0.1.0"
+description = "Python bindings for drift-rust-core"
+requires-python = ">=3.9"

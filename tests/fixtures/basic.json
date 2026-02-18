@@ -1,0 +1,20 @@
+{
+  "name": "basic",
+  "input": {
+    "request": {
+      "method": "GET",
+      "url": "https://api.example.com/v1/users",
+      "headers": {
+        "accept": "application/json",
+        "x-debug": null
+      }
+    },
+    "response": {
+      "status": 200,
+      "body": {
+        "id": 123,
+        "active": true
+      }
+    }
+  }
+}

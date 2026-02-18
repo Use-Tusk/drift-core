@@ -1,0 +1,16 @@
+[package]
+name = "drift-rust-core-python"
+version.workspace = true
+edition = "2024"
+license = "Apache-2.0"
+description = "Python bindings for drift-rust-core"
+publish = false
+
+[lib]
+name = "drift_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+drift-rust-core = { path = "../../crates/drift-rust-core" }
+pyo3 = { version = "0.27", features = ["extension-module", "abi3", "abi3-py39"] }
+serde_json = "1"
