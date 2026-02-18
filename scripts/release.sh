@@ -34,6 +34,7 @@ fi
 info "Bump type: $BUMP_TYPE"
 
 ROOT_CARGO_TOML="Cargo.toml"
+CARGO_LOCK="Cargo.lock"
 PYPROJECT_TOML="bindings/python/pyproject.toml"
 NODE_DIR="bindings/node"
 NODE_PACKAGE_JSON="$NODE_DIR/package.json"
@@ -213,11 +214,12 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "This will:"
 echo "  1. Update version in $ROOT_CARGO_TOML to $NEW_VERSION"
-echo "  2. Update version in $PYPROJECT_TOML to $NEW_VERSION"
-echo "  3. Update version in $NODE_PACKAGE_JSON (+ lockfile) to $NEW_VERSION"
-echo "  4. Commit the version bump"
-echo "  5. Create and push tag $NEW_TAG"
-echo "  6. Optionally create GitHub release via gh CLI"
+echo "  2. Refresh $CARGO_LOCK for the new workspace version"
+echo "  3. Update version in $PYPROJECT_TOML to $NEW_VERSION"
+echo "  4. Update version in $NODE_PACKAGE_JSON (+ lockfile) to $NEW_VERSION"
+echo "  5. Commit the version bump"
+echo "  6. Create and push tag $NEW_TAG"
+echo "  7. Optionally create GitHub release via gh CLI"
 echo ""
 
 read -r -p "Proceed? [y/N] " REPLY
@@ -228,6 +230,9 @@ fi
 
 info "Updating workspace Cargo version..."
 set_workspace_version "$NEW_VERSION"
+
+info "Refreshing Cargo lockfile..."
+CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}" RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" cargo check --workspace >/dev/null
 
 info "Updating Python package version..."
 set_pyproject_version "$NEW_VERSION"
@@ -254,7 +259,7 @@ if [[ "$UPDATED_NODE_LOCK_VERSION" != "$NEW_VERSION" ]]; then
 fi
 
 info "Committing version bump..."
-git add "$ROOT_CARGO_TOML" "$PYPROJECT_TOML" "$NODE_PACKAGE_JSON" "$NODE_PACKAGE_LOCK"
+git add "$ROOT_CARGO_TOML" "$CARGO_LOCK" "$PYPROJECT_TOML" "$NODE_PACKAGE_JSON" "$NODE_PACKAGE_LOCK"
 git commit -m "chore: bump version to $NEW_VERSION"
 
 info "Creating tag $NEW_TAG..."
