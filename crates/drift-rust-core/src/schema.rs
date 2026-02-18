@@ -75,8 +75,7 @@ fn apply_schema_merges_top_level(
 
         if merge.encoding == Some(1)
             && let JsonValue::String(s) = &working_value
-            && let Ok(bytes) =
-                base64::engine::general_purpose::STANDARD.decode(s.as_bytes())
+            && let Ok(bytes) = base64::engine::general_purpose::STANDARD.decode(s.as_bytes())
         {
             working_value = JsonValue::String(String::from_utf8_lossy(&bytes).to_string());
         }
@@ -139,10 +138,7 @@ fn generate_schema_json_value(
                     && let JsonValue::Object(child_obj) = &mut child_schema
                 {
                     if let Some(enc) = merge.encoding {
-                        child_obj.insert(
-                            "encoding".to_string(),
-                            JsonValue::Number(enc.into()),
-                        );
+                        child_obj.insert("encoding".to_string(), JsonValue::Number(enc.into()));
                     }
                     if let Some(decoded_type) = merge.decoded_type {
                         child_obj.insert(
@@ -153,10 +149,7 @@ fn generate_schema_json_value(
                     if let Some(match_importance) = merge.match_importance
                         && let Some(n) = serde_json::Number::from_f64(match_importance)
                     {
-                        child_obj.insert(
-                            "match_importance".to_string(),
-                            JsonValue::Number(n),
-                        );
+                        child_obj.insert("match_importance".to_string(), JsonValue::Number(n));
                     }
                 }
                 props.insert(k.clone(), child_schema);
