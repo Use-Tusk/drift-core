@@ -53,6 +53,7 @@ pub fn process_export_payload(
 }
 
 #[pyfunction]
+#[allow(clippy::type_complexity)]
 pub fn process_export_payload_pyobject(
     py: Python<'_>,
     payload: &Bound<'_, PyAny>,

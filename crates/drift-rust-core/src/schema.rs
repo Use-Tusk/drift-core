@@ -73,20 +73,19 @@ fn apply_schema_merges_top_level(
         };
         let mut working_value = value.clone();
 
-        if merge.encoding == Some(1) {
-            if let JsonValue::String(s) = &working_value {
-                if let Ok(bytes) = base64::engine::general_purpose::STANDARD.decode(s.as_bytes()) {
-                    working_value = JsonValue::String(String::from_utf8_lossy(&bytes).to_string());
-                }
-            }
+        if merge.encoding == Some(1)
+            && let JsonValue::String(s) = &working_value
+            && let Ok(bytes) =
+                base64::engine::general_purpose::STANDARD.decode(s.as_bytes())
+        {
+            working_value = JsonValue::String(String::from_utf8_lossy(&bytes).to_string());
         }
 
-        if merge.decoded_type == Some(1) {
-            if let JsonValue::String(s) = &working_value {
-                if let Ok(parsed) = serde_json::from_str::<JsonValue>(s) {
-                    working_value = parsed;
-                }
-            }
+        if merge.decoded_type == Some(1)
+            && let JsonValue::String(s) = &working_value
+            && let Ok(parsed) = serde_json::from_str::<JsonValue>(s)
+        {
+            working_value = parsed;
         }
 
         decoded.insert(key.clone(), working_value);
@@ -134,33 +133,30 @@ fn generate_schema_json_value(
             let mut props = serde_json::Map::new();
             for (k, child) in map {
                 let mut child_schema = generate_schema_json_value(child, None, false);
-                if at_object_root {
-                    if let Some(merges) = schema_merges {
-                        if let Some(merge) = merges.get(k) {
-                            if let JsonValue::Object(child_obj) = &mut child_schema {
-                                if let Some(enc) = merge.encoding {
-                                    child_obj.insert(
-                                        "encoding".to_string(),
-                                        JsonValue::Number(enc.into()),
-                                    );
-                                }
-                                if let Some(decoded_type) = merge.decoded_type {
-                                    child_obj.insert(
-                                        "decoded_type".to_string(),
-                                        JsonValue::Number(decoded_type.into()),
-                                    );
-                                }
-                                if let Some(match_importance) = merge.match_importance {
-                                    if let Some(n) = serde_json::Number::from_f64(match_importance)
-                                    {
-                                        child_obj.insert(
-                                            "match_importance".to_string(),
-                                            JsonValue::Number(n),
-                                        );
-                                    }
-                                }
-                            }
-                        }
+                if at_object_root
+                    && let Some(merges) = schema_merges
+                    && let Some(merge) = merges.get(k)
+                    && let JsonValue::Object(child_obj) = &mut child_schema
+                {
+                    if let Some(enc) = merge.encoding {
+                        child_obj.insert(
+                            "encoding".to_string(),
+                            JsonValue::Number(enc.into()),
+                        );
+                    }
+                    if let Some(decoded_type) = merge.decoded_type {
+                        child_obj.insert(
+                            "decoded_type".to_string(),
+                            JsonValue::Number(decoded_type.into()),
+                        );
+                    }
+                    if let Some(match_importance) = merge.match_importance
+                        && let Some(n) = serde_json::Number::from_f64(match_importance)
+                    {
+                        child_obj.insert(
+                            "match_importance".to_string(),
+                            JsonValue::Number(n),
+                        );
                     }
                 }
                 props.insert(k.clone(), child_schema);
