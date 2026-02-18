@@ -108,8 +108,11 @@ Runs on GitHub Release publish (and manual dispatch):
 
 Required secrets:
 
-- `PYPI_API_TOKEN`
 - `NPM_TOKEN`
+
+PyPI publishing uses GitHub trusted publishing (OIDC), so no PyPI API token is
+required. Ensure the PyPI project `drift-core-python` has a trusted publisher
+configured for this repository/workflow.
 
 ## Versioning model
 
