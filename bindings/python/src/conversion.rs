@@ -13,7 +13,9 @@ pub fn py_to_json_value(value: &Bound<'_, PyAny>) -> PyResult<JsonValue> {
         return Ok(JsonValue::Number(JsonNumber::from(v)));
     }
     if let Ok(v) = value.extract::<f64>() {
-        return Ok(JsonNumber::from_f64(v).map(JsonValue::Number).unwrap_or(JsonValue::Null));
+        return Ok(JsonNumber::from_f64(v)
+            .map(JsonValue::Number)
+            .unwrap_or(JsonValue::Null));
     }
     if let Ok(v) = value.extract::<String>() {
         return Ok(JsonValue::String(v));
@@ -91,7 +93,9 @@ pub fn py_any_to_optional_bytes(value: Option<&Bound<'_, PyAny>>) -> PyResult<Op
             if let Ok(py_bytes) = v.cast::<PyBytes>() {
                 Ok(Some(py_bytes.as_bytes().to_vec()))
             } else {
-                Err(pyo3::exceptions::PyTypeError::new_err("expected bytes or None"))
+                Err(pyo3::exceptions::PyTypeError::new_err(
+                    "expected bytes or None",
+                ))
             }
         }
         _ => Ok(None),

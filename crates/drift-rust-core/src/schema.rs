@@ -51,9 +51,12 @@ pub(crate) fn process_export_payload_value(
     })
 }
 
-fn apply_schema_merges_top_level(normalized: &JsonValue, schema_merges_json: &str) -> CoreResult<JsonValue> {
-    let merge_map: BTreeMap<String, MergeRule> =
-        serde_json::from_str(schema_merges_json).map_err(|e| CoreError::InvalidJson(e.to_string()))?;
+fn apply_schema_merges_top_level(
+    normalized: &JsonValue,
+    schema_merges_json: &str,
+) -> CoreResult<JsonValue> {
+    let merge_map: BTreeMap<String, MergeRule> = serde_json::from_str(schema_merges_json)
+        .map_err(|e| CoreError::InvalidJson(e.to_string()))?;
 
     if merge_map.is_empty() {
         return Ok(normalized.clone());
@@ -109,8 +112,14 @@ fn generate_schema_json_value(
     at_object_root: bool,
 ) -> JsonValue {
     let mut schema_obj = serde_json::Map::new();
-    schema_obj.insert("type".to_string(), JsonValue::Number(json_type_code(value).into()));
-    schema_obj.insert("properties".to_string(), JsonValue::Object(serde_json::Map::new()));
+    schema_obj.insert(
+        "type".to_string(),
+        JsonValue::Number(json_type_code(value).into()),
+    );
+    schema_obj.insert(
+        "properties".to_string(),
+        JsonValue::Object(serde_json::Map::new()),
+    );
 
     match value {
         JsonValue::Array(arr) => {
@@ -130,14 +139,24 @@ fn generate_schema_json_value(
                         if let Some(merge) = merges.get(k) {
                             if let JsonValue::Object(child_obj) = &mut child_schema {
                                 if let Some(enc) = merge.encoding {
-                                    child_obj.insert("encoding".to_string(), JsonValue::Number(enc.into()));
+                                    child_obj.insert(
+                                        "encoding".to_string(),
+                                        JsonValue::Number(enc.into()),
+                                    );
                                 }
                                 if let Some(decoded_type) = merge.decoded_type {
-                                    child_obj.insert("decoded_type".to_string(), JsonValue::Number(decoded_type.into()));
+                                    child_obj.insert(
+                                        "decoded_type".to_string(),
+                                        JsonValue::Number(decoded_type.into()),
+                                    );
                                 }
                                 if let Some(match_importance) = merge.match_importance {
-                                    if let Some(n) = serde_json::Number::from_f64(match_importance) {
-                                        child_obj.insert("match_importance".to_string(), JsonValue::Number(n));
+                                    if let Some(n) = serde_json::Number::from_f64(match_importance)
+                                    {
+                                        child_obj.insert(
+                                            "match_importance".to_string(),
+                                            JsonValue::Number(n),
+                                        );
                                     }
                                 }
                             }

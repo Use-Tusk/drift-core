@@ -13,15 +13,16 @@ pub fn deterministic_hash(payload_json: &str) -> CoreResult<String> {
 pub fn normalize_and_hash(payload_json: &str) -> CoreResult<(String, String)> {
     let input = parse_json(payload_json)?;
     let normalized_value = json_roundtrip_normalize(&input)?;
-    let normalized_json =
-        serde_json::to_string(&normalized_value).map_err(|e| CoreError::SerializationError(e.to_string()))?;
+    let normalized_json = serde_json::to_string(&normalized_value)
+        .map_err(|e| CoreError::SerializationError(e.to_string()))?;
     let hash = hash_json_value_deterministic(&normalized_value)?;
     Ok((normalized_json, hash))
 }
 
 pub(crate) fn hash_json_value_deterministic(v: &JsonValue) -> CoreResult<String> {
     let sorted = sort_keys_recursively(v);
-    let compact = serde_json::to_string(&sorted).map_err(|e| CoreError::SerializationError(e.to_string()))?;
+    let compact =
+        serde_json::to_string(&sorted).map_err(|e| CoreError::SerializationError(e.to_string()))?;
     let mut hasher = Sha256::new();
     hasher.update(compact.as_bytes());
     Ok(format!("{:x}", hasher.finalize()))

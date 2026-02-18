@@ -1,7 +1,9 @@
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyList};
 
-use crate::conversion::{json_value_to_py, py_any_to_optional_bytes, py_any_to_optional_json, py_to_json_value};
+use crate::conversion::{
+    json_value_to_py, py_any_to_optional_bytes, py_any_to_optional_json, py_to_json_value,
+};
 use crate::error::map_core_err;
 
 #[pyfunction]
@@ -68,12 +70,10 @@ pub fn process_export_payload_pyobject(
 
     drift_rust_core::process_export_payload_value(&payload_value, schema_merges_json.as_deref())
         .and_then(|result| {
-            let normalized_py = json_value_to_py(py, &result.normalized_value).map_err(|e| {
-                drift_rust_core::CoreError::SerializationError(e.to_string())
-            })?;
-            let schema_py = json_value_to_py(py, &result.decoded_schema_value).map_err(|e| {
-                drift_rust_core::CoreError::SerializationError(e.to_string())
-            })?;
+            let normalized_py = json_value_to_py(py, &result.normalized_value)
+                .map_err(|e| drift_rust_core::CoreError::SerializationError(e.to_string()))?;
+            let schema_py = json_value_to_py(py, &result.decoded_schema_value)
+                .map_err(|e| drift_rust_core::CoreError::SerializationError(e.to_string()))?;
             Ok((
                 normalized_py,
                 result.decoded_value_hash,
@@ -168,14 +168,14 @@ pub fn build_export_spans_request_bytes_pyobject(
     sdk_instance_id: &str,
     spans: &Bound<'_, PyAny>,
 ) -> PyResult<Vec<u8>> {
-    let span_list = spans.cast::<PyList>().map_err(|_| {
-        pyo3::exceptions::PyTypeError::new_err("spans must be a list of bytes")
-    })?;
+    let span_list = spans
+        .cast::<PyList>()
+        .map_err(|_| pyo3::exceptions::PyTypeError::new_err("spans must be a list of bytes"))?;
     let mut span_bytes = Vec::with_capacity(span_list.len());
     for item in span_list.iter() {
-        let py_bytes = item.cast::<PyBytes>().map_err(|_| {
-            pyo3::exceptions::PyTypeError::new_err("each span must be bytes")
-        })?;
+        let py_bytes = item
+            .cast::<PyBytes>()
+            .map_err(|_| pyo3::exceptions::PyTypeError::new_err("each span must be bytes"))?;
         span_bytes.push(py_bytes.as_bytes().to_vec());
     }
 

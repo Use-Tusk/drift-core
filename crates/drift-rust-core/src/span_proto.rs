@@ -12,16 +12,28 @@ pub fn build_span_proto_bytes(input: BuildSpanProtoInput<'_>) -> CoreResult<Vec<
     let input_struct = if let Some(bytes) = input.input_value_proto_struct_bytes {
         Struct::decode(bytes).map_err(|e| CoreError::SerializationError(e.to_string()))?
     } else {
-        json_object_to_struct(input.input_value.unwrap_or(&JsonValue::Object(serde_json::Map::new())))
+        json_object_to_struct(
+            input
+                .input_value
+                .unwrap_or(&JsonValue::Object(serde_json::Map::new())),
+        )
     };
 
     let output_struct = if let Some(bytes) = input.output_value_proto_struct_bytes {
         Struct::decode(bytes).map_err(|e| CoreError::SerializationError(e.to_string()))?
     } else {
-        json_object_to_struct(input.output_value.unwrap_or(&JsonValue::Object(serde_json::Map::new())))
+        json_object_to_struct(
+            input
+                .output_value
+                .unwrap_or(&JsonValue::Object(serde_json::Map::new())),
+        )
     };
 
-    let metadata_struct = json_object_to_struct(input.metadata.unwrap_or(&JsonValue::Object(serde_json::Map::new())));
+    let metadata_struct = json_object_to_struct(
+        input
+            .metadata
+            .unwrap_or(&JsonValue::Object(serde_json::Map::new())),
+    );
 
     let span = Span {
         trace_id: input.trace_id.to_string(),

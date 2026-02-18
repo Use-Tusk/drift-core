@@ -5,13 +5,16 @@ use crate::normalize::parse_json;
 use crate::schema;
 use crate::types::{ExportPayloadResult, ExportPayloadValueResult};
 
-pub fn process_export_payload(payload_json: &str, schema_merges_json: Option<&str>) -> CoreResult<ExportPayloadResult> {
+pub fn process_export_payload(
+    payload_json: &str,
+    schema_merges_json: Option<&str>,
+) -> CoreResult<ExportPayloadResult> {
     let input = parse_json(payload_json)?;
     let value_result = process_export_payload_value(&input, schema_merges_json)?;
-    let normalized_json =
-        serde_json::to_string(&value_result.normalized_value).map_err(|e| CoreError::SerializationError(e.to_string()))?;
-    let decoded_json =
-        serde_json::to_string(&value_result.decoded_value).map_err(|e| CoreError::SerializationError(e.to_string()))?;
+    let normalized_json = serde_json::to_string(&value_result.normalized_value)
+        .map_err(|e| CoreError::SerializationError(e.to_string()))?;
+    let decoded_json = serde_json::to_string(&value_result.decoded_value)
+        .map_err(|e| CoreError::SerializationError(e.to_string()))?;
 
     Ok(ExportPayloadResult {
         normalized_json,

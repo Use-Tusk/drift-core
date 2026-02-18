@@ -14,8 +14,9 @@ pub fn build_export_spans_request_bytes(
     let spans = span_proto_bytes_list
         .iter()
         .map(|span_bytes| {
-            Span::decode(span_bytes.as_slice())
-                .map_err(|e| CoreError::SerializationError(format!("failed to decode span proto bytes: {e}")))
+            Span::decode(span_bytes.as_slice()).map_err(|e| {
+                CoreError::SerializationError(format!("failed to decode span proto bytes: {e}"))
+            })
         })
         .collect::<CoreResult<Vec<_>>>()?;
 
