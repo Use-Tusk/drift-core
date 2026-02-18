@@ -121,10 +121,12 @@ jobs:
           toolchain: 1.93.1
 
       - name: Install dependencies
-        run: npm ci --prefix bindings/node
+        working-directory: bindings/node
+        run: npm ci
 
       - name: Build native addon
-        run: npm run build --prefix bindings/node
+        working-directory: bindings/node
+        run: npm run build
 
       - name: Upload native addon artifact
         uses: actions/upload-artifact@v4
@@ -156,9 +158,11 @@ jobs:
           path: bindings/node
 
       - name: Verify packaged files
-        run: npm pack --dry-run --prefix bindings/node
+        working-directory: bindings/node
+        run: npm pack --dry-run
 
       - name: Publish to npm
+        working-directory: bindings/node
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public --prefix bindings/node
+        run: npm publish --access public
