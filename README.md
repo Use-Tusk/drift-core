@@ -12,7 +12,7 @@ This repository centralizes performance-sensitive logic used across Drift SDKs
 - `bindings/python`:
   Python extension module package published as `drift-core-python`
 - `bindings/node`:
-  Node native addon package published as `drift-core-node`
+  Node native addon package published as `@use-tusk/drift-core-node`
 - `tests/`:
   cross-language parity fixtures and smoke tests
 
@@ -39,5 +39,5 @@ End users of Python/Node SDKs should not need a Rust toolchain during normal
 installation.
 
 - Python path: distribute platform wheels for `drift-core-python`
-- Node path: distribute platform prebuilt native artifacts for `drift-core-node`
+- Node path: distribute platform prebuilt native artifacts for `@use-tusk/drift-core-node`
 - Source builds remain fallback for unsupported targets

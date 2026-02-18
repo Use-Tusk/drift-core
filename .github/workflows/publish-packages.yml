@@ -113,6 +113,7 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+          scope: "@use-tusk"
           cache-dependency-path: bindings/node/package-lock.json
 
       - name: Set up Rust
@@ -147,6 +148,7 @@ jobs:
         with:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
+          scope: "@use-tusk"
           cache: "npm"
           cache-dependency-path: bindings/node/package-lock.json
 

@@ -14,7 +14,7 @@ and release workflow for `drift-core`.
 
 - `crates/drift-rust-core`: shared Rust core logic
 - `bindings/python`: `pyo3` Python extension package (`drift-core-python`)
-- `bindings/node`: `napi-rs` Node addon package (`drift-core-node`)
+- `bindings/node`: `napi-rs` Node addon package (`@use-tusk/drift-core-node`)
 - `tests/fixtures`: shared parity fixtures
 - `tests/parity`: cross-language smoke checks
 
@@ -104,7 +104,7 @@ Runs on GitHub Release publish (and manual dispatch):
 - builds Python wheels (Linux/macOS/Windows) + sdist
 - publishes Python package to PyPI (`drift-core-python`)
 - builds Node native addons for release matrix
-- publishes Node package to npm (`drift-core-node`)
+- publishes Node package to npm (`@use-tusk/drift-core-node`)
 
 Required secrets:
 
@@ -120,7 +120,7 @@ This repo currently uses lockstep versioning across:
 
 - `Cargo.toml` (`[workspace.package].version`)
 - `bindings/python/pyproject.toml` (`drift-core-python`)
-- `bindings/node/package.json` (`drift-core-node`)
+- `bindings/node/package.json` (`@use-tusk/drift-core-node`)
 
 The Rust binding crate manifests use `version.workspace = true` and `publish = false`.
 
