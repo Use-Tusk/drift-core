@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyList};
+use tusk_drift_schemas::tusk::drift::core::v1::{PackageType, SpanKind, StatusCode};
 
 use crate::conversion::{
     json_value_to_py, py_any_to_optional_bytes, py_any_to_optional_json, py_to_json_value,
@@ -126,6 +127,14 @@ pub fn build_span_proto_bytes_pyobject(
     let output_value_json = py_any_to_optional_json(output_value)?;
     let input_struct_bytes = py_any_to_optional_bytes(input_value_proto_struct_bytes)?;
     let output_struct_bytes = py_any_to_optional_bytes(output_value_proto_struct_bytes)?;
+    let package_type = PackageType::try_from(package_type).map_err(|_| {
+        pyo3::exceptions::PyValueError::new_err(format!("invalid package_type enum: {package_type}"))
+    })?;
+    let kind = SpanKind::try_from(kind)
+        .map_err(|_| pyo3::exceptions::PyValueError::new_err(format!("invalid kind enum: {kind}")))?;
+    let status_code = StatusCode::try_from(status_code).map_err(|_| {
+        pyo3::exceptions::PyValueError::new_err(format!("invalid status_code enum: {status_code}"))
+    })?;
 
     drift_rust_core::build_span_proto_bytes(drift_rust_core::BuildSpanProtoInput {
         trace_id,

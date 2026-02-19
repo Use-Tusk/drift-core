@@ -1,6 +1,7 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use serde_json::Value as JsonValue;
+use tusk_drift_schemas::tusk::drift::core::v1::{PackageType, SpanKind, StatusCode};
 
 use crate::conversion::{tuple_to_normalize_and_hash_result, vec_to_buffer};
 use crate::error::map_core_err;
@@ -127,6 +128,12 @@ pub fn build_span_proto_bytes(input: BuildSpanProtoBytesInput) -> Result<Buffer>
         .map(serde_json::from_str)
         .transpose()
         .map_err(|e| Error::from_reason(format!("invalid output_value_json: {e}")))?;
+    let package_type = PackageType::try_from(input.package_type)
+        .map_err(|_| Error::from_reason(format!("invalid package_type enum: {}", input.package_type)))?;
+    let kind = SpanKind::try_from(input.kind)
+        .map_err(|_| Error::from_reason(format!("invalid kind enum: {}", input.kind)))?;
+    let status_code = StatusCode::try_from(input.status_code)
+        .map_err(|_| Error::from_reason(format!("invalid status_code enum: {}", input.status_code)))?;
 
     drift_rust_core::build_span_proto_bytes(drift_rust_core::BuildSpanProtoInput {
         trace_id: &input.trace_id,
@@ -136,16 +143,16 @@ pub fn build_span_proto_bytes(input: BuildSpanProtoBytesInput) -> Result<Buffer>
         package_name: &input.package_name,
         instrumentation_name: &input.instrumentation_name,
         submodule_name: &input.submodule_name,
-        package_type: input.package_type,
+        package_type,
         environment: input.environment.as_deref(),
-        kind: input.kind,
+        kind,
         input_schema: &input_schema,
         output_schema: &output_schema,
         input_schema_hash: &input.input_schema_hash,
         output_schema_hash: &input.output_schema_hash,
         input_value_hash: &input.input_value_hash,
         output_value_hash: &input.output_value_hash,
-        status_code: input.status_code,
+        status_code,
         status_message: &input.status_message,
         is_pre_app_start: input.is_pre_app_start,
         is_root_span: input.is_root_span,

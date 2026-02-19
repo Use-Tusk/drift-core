@@ -60,4 +60,18 @@ mod tests {
         assert_eq!(decoded.spans.len(), 1);
         assert_eq!(decoded.spans[0].trace_id, "trace-1");
     }
+
+    #[test]
+    fn returns_error_when_span_bytes_are_invalid() {
+        let err = build_export_spans_request_bytes(
+            "svc-1",
+            "test",
+            "0.1.0",
+            "sdk-instance-1",
+            &[vec![0xff, 0x00, 0xab]],
+        )
+        .expect_err("invalid span bytes should fail");
+
+        assert!(matches!(err, CoreError::SerializationError(_)));
+    }
 }

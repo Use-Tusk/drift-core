@@ -126,6 +126,7 @@ dependencies = [
  "napi-build",
  "napi-derive",
  "serde_json",
+ "tusk-drift-schemas",
 ]
 
 [[package]]
@@ -135,6 +136,7 @@ dependencies = [
  "drift-rust-core",
  "pyo3",
  "serde_json",
+ "tusk-drift-schemas",
 ]
 
 [[package]]

@@ -67,3 +67,35 @@ fn json_to_protobuf_value(v: &JsonValue) -> Value {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use prost_types::value::Kind;
+
+    #[test]
+    fn object_to_protobuf_struct_preserves_top_level_fields() {
+        let payload = r#"{"n":1,"s":"x","b":true,"arr":[1,2],"obj":{"k":"v"},"nullv":null}"#;
+        let s = object_to_protobuf_struct(payload).expect("conversion should succeed");
+
+        assert_eq!(s.fields.len(), 6);
+        assert!(matches!(
+            s.fields.get("nullv").and_then(|v| v.kind.as_ref()),
+            Some(Kind::NullValue(_))
+        ));
+    }
+
+    #[test]
+    fn non_object_json_yields_empty_struct() {
+        let s = object_to_protobuf_struct("[1,2,3]").expect("conversion should succeed");
+        assert!(s.fields.is_empty());
+    }
+
+    #[test]
+    fn object_to_protobuf_struct_field_count_matches_field_total() {
+        let payload = r#"{"a":1,"b":2,"c":{"nested":3}}"#;
+        let count =
+            object_to_protobuf_struct_field_count(payload).expect("field count should succeed");
+        assert_eq!(count, 3);
+    }
+}

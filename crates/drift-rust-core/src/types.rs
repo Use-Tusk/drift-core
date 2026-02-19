@@ -1,4 +1,5 @@
 use serde_json::Value as JsonValue;
+use tusk_drift_schemas::tusk::drift::core::v1::{PackageType, SpanKind, StatusCode};
 
 #[derive(Debug, Clone)]
 pub struct ExportPayloadResult {
@@ -28,16 +29,16 @@ pub struct BuildSpanProtoInput<'a> {
     pub package_name: &'a str,
     pub instrumentation_name: &'a str,
     pub submodule_name: &'a str,
-    pub package_type: i32,
+    pub package_type: PackageType,
     pub environment: Option<&'a str>,
-    pub kind: i32,
+    pub kind: SpanKind,
     pub input_schema: &'a JsonValue,
     pub output_schema: &'a JsonValue,
     pub input_schema_hash: &'a str,
     pub output_schema_hash: &'a str,
     pub input_value_hash: &'a str,
     pub output_value_hash: &'a str,
-    pub status_code: i32,
+    pub status_code: StatusCode,
     pub status_message: &'a str,
     pub is_pre_app_start: bool,
     pub is_root_span: bool,

@@ -43,7 +43,7 @@ pub fn build_span_proto_bytes(input: BuildSpanProtoInput<'_>) -> CoreResult<Vec<
         package_name: input.package_name.to_string(),
         instrumentation_name: input.instrumentation_name.to_string(),
         submodule_name: input.submodule_name.to_string(),
-        package_type: input.package_type,
+        package_type: input.package_type as i32,
         input_value: Some(input_struct),
         output_value: Some(output_struct),
         input_schema: Some(json_schema_from_value(input.input_schema)),
@@ -52,9 +52,9 @@ pub fn build_span_proto_bytes(input: BuildSpanProtoInput<'_>) -> CoreResult<Vec<
         output_schema_hash: input.output_schema_hash.to_string(),
         input_value_hash: input.input_value_hash.to_string(),
         output_value_hash: input.output_value_hash.to_string(),
-        kind: input.kind,
+        kind: input.kind as i32,
         status: Some(SpanStatus {
-            code: input.status_code,
+            code: input.status_code as i32,
             message: input.status_message.to_string(),
         }),
         is_pre_app_start: input.is_pre_app_start,
@@ -123,6 +123,7 @@ fn json_schema_from_value(value: &JsonValue) -> JsonSchema {
 mod tests {
     use super::*;
     use crate::types::BuildSpanProtoInput;
+    use tusk_drift_schemas::tusk::drift::core::v1::{PackageType, SpanKind, StatusCode};
 
     #[test]
     fn build_span_proto_bytes_decodes_as_generated_span() {
@@ -140,16 +141,16 @@ mod tests {
             package_name: "http",
             instrumentation_name: "instr",
             submodule_name: "GET",
-            package_type: 1,
+            package_type: PackageType::Http,
             environment: Some("test"),
-            kind: 2,
+            kind: SpanKind::Server,
             input_schema: &input_schema,
             output_schema: &output_schema,
             input_schema_hash: "ih",
             output_schema_hash: "oh",
             input_value_hash: "ivh",
             output_value_hash: "ovh",
-            status_code: 1,
+            status_code: StatusCode::Ok,
             status_message: "ok",
             is_pre_app_start: false,
             is_root_span: true,
@@ -170,5 +171,46 @@ mod tests {
         assert_eq!(decoded.package_type, 1);
         assert_eq!(decoded.kind, 2);
         assert_eq!(decoded.environment.as_deref(), Some("test"));
+    }
+
+    #[test]
+    fn returns_error_when_prebuilt_proto_struct_bytes_are_invalid() {
+        let input_schema = serde_json::json!({"type": 6, "properties": {}});
+        let output_schema = serde_json::json!({"type": 6, "properties": {}});
+
+        let err = build_span_proto_bytes(BuildSpanProtoInput {
+            trace_id: "trace-1",
+            span_id: "span-1",
+            parent_span_id: "",
+            name: "test-span",
+            package_name: "http",
+            instrumentation_name: "instr",
+            submodule_name: "GET",
+            package_type: PackageType::Http,
+            environment: Some("test"),
+            kind: SpanKind::Server,
+            input_schema: &input_schema,
+            output_schema: &output_schema,
+            input_schema_hash: "ih",
+            output_schema_hash: "oh",
+            input_value_hash: "ivh",
+            output_value_hash: "ovh",
+            status_code: StatusCode::Ok,
+            status_message: "ok",
+            is_pre_app_start: false,
+            is_root_span: true,
+            timestamp_seconds: 1,
+            timestamp_nanos: 2,
+            duration_seconds: 3,
+            duration_nanos: 4,
+            metadata: None,
+            input_value: None,
+            output_value: None,
+            input_value_proto_struct_bytes: Some(&[0xff, 0x00]),
+            output_value_proto_struct_bytes: None,
+        })
+        .expect_err("invalid struct bytes should fail");
+
+        assert!(matches!(err, CoreError::SerializationError(_)));
     }
 }
