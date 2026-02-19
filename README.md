@@ -1,43 +1,37 @@
 # Tusk Drift Core
 
+[![CI](https://github.com/Use-Tusk/drift-core/actions/workflows/ci.yml/badge.svg)](https://github.com/Use-Tusk/drift-core/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/drift-core-python)](https://pypi.org/project/drift-core-python/)
+[![npm](https://img.shields.io/npm/v/%40use-tusk%2Fdrift-core-node)](https://www.npmjs.com/package/@use-tusk/drift-core-node)
+
 Shared Rust core and native language bindings for the Tusk Drift SDK suite.
 
-This repository centralizes performance-sensitive logic used across Drift SDKs
-(Python and Node), then exposes that logic through language-specific bindings.
+This repository centralizes shared, performance-sensitive logic used by Drift
+SDKs (Python and Node) and exposes it through native bindings.
 
-## What this repo contains
+## Repository layout
 
-- `crates/drift-rust-core`:
-  shared Rust implementation of normalization, hashing, and protobuf export helpers
-- `bindings/python`:
-  Python extension module package published as `drift-core-python`
-- `bindings/node`:
-  Node native addon package published as `@use-tusk/drift-core-node`
-- `tests/`:
-  cross-language parity fixtures and smoke tests
+- `crates/drift-rust-core`: shared Rust implementation
+- `bindings/python`: Python package (`drift-core-python`)
+- `bindings/node`: Node package (`@use-tusk/drift-core-node`)
+- `tests/`: cross-language parity fixtures and smoke checks
 
-## Why this repo exists
+## Schema source of truth
 
-The goal is to avoid re-implementing the same CPU-heavy logic in each SDK and
-to reduce runtime overhead in hot export paths.
+[`tusk-drift-schemas`](https://github.com/Use-Tusk/tusk-drift-schemas) owns
+the protobuf contracts. `drift-rust-core` consumes generated Rust types from
+the published [`tusk-drift-schemas`](https://crates.io/crates/tusk-drift-schemas)
+crate.
 
-Key capabilities currently implemented in the Rust core include:
+## Key docs
 
-- deterministic JSON normalization and hashing
-- object-to-protobuf `Struct` conversion helpers
-- coalesced export payload processing helpers
-- span protobuf byte construction
-- export request protobuf byte construction
+- Architecture and design: [`docs/design.md`](docs/design.md)
+- Development and release workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
-## Schema dependency
+## Runtime expectations
 
-[`tusk-drift-schemas`](https://github.com/Use-Tusk/tusk-drift-schemas) is the protobuf source of truth.  [`drift-rust-core`](crates/drift-rust-core) consumes generated Rust types from the published [`tusk-drift-schemas`](https://crates.io/crates/tusk-drift-schemas) crate.
+SDK users should not need a Rust toolchain for normal installs:
 
-## Runtime expectations for SDK users
-
-End users of Python/Node SDKs should not need a Rust toolchain during normal
-installation.
-
-- Python path: distribute platform wheels for `drift-core-python`
-- Node path: distribute platform prebuilt native artifacts for `@use-tusk/drift-core-node`
-- Source builds remain fallback for unsupported targets
+- Python: prebuilt wheels for `drift-core-python`
+- Node: prebuilt native artifacts for `@use-tusk/drift-core-node`
+- Source builds are fallback for unsupported targets
