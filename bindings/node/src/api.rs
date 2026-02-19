@@ -128,12 +128,14 @@ pub fn build_span_proto_bytes(input: BuildSpanProtoBytesInput) -> Result<Buffer>
         .map(serde_json::from_str)
         .transpose()
         .map_err(|e| Error::from_reason(format!("invalid output_value_json: {e}")))?;
-    let package_type = PackageType::try_from(input.package_type)
-        .map_err(|_| Error::from_reason(format!("invalid package_type enum: {}", input.package_type)))?;
+    let package_type = PackageType::try_from(input.package_type).map_err(|_| {
+        Error::from_reason(format!("invalid package_type enum: {}", input.package_type))
+    })?;
     let kind = SpanKind::try_from(input.kind)
         .map_err(|_| Error::from_reason(format!("invalid kind enum: {}", input.kind)))?;
-    let status_code = StatusCode::try_from(input.status_code)
-        .map_err(|_| Error::from_reason(format!("invalid status_code enum: {}", input.status_code)))?;
+    let status_code = StatusCode::try_from(input.status_code).map_err(|_| {
+        Error::from_reason(format!("invalid status_code enum: {}", input.status_code))
+    })?;
 
     drift_rust_core::build_span_proto_bytes(drift_rust_core::BuildSpanProtoInput {
         trace_id: &input.trace_id,

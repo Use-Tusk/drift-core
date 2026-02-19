@@ -128,10 +128,13 @@ pub fn build_span_proto_bytes_pyobject(
     let input_struct_bytes = py_any_to_optional_bytes(input_value_proto_struct_bytes)?;
     let output_struct_bytes = py_any_to_optional_bytes(output_value_proto_struct_bytes)?;
     let package_type = PackageType::try_from(package_type).map_err(|_| {
-        pyo3::exceptions::PyValueError::new_err(format!("invalid package_type enum: {package_type}"))
+        pyo3::exceptions::PyValueError::new_err(format!(
+            "invalid package_type enum: {package_type}"
+        ))
     })?;
-    let kind = SpanKind::try_from(kind)
-        .map_err(|_| pyo3::exceptions::PyValueError::new_err(format!("invalid kind enum: {kind}")))?;
+    let kind = SpanKind::try_from(kind).map_err(|_| {
+        pyo3::exceptions::PyValueError::new_err(format!("invalid kind enum: {kind}"))
+    })?;
     let status_code = StatusCode::try_from(status_code).map_err(|_| {
         pyo3::exceptions::PyValueError::new_err(format!("invalid status_code enum: {status_code}"))
     })?;

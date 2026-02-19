@@ -58,7 +58,10 @@ mod tests {
         let result = process_export_payload_value(&payload, Some(merges))
             .expect("processing with merges should work");
 
-        assert_eq!(result.decoded_value["decoded_blob"]["k"], serde_json::json!("v"));
+        assert_eq!(
+            result.decoded_value["decoded_blob"]["k"],
+            serde_json::json!("v")
+        );
         assert_eq!(
             result.decoded_schema_value["properties"]["decoded_blob"]["encoding"],
             serde_json::json!(1)
