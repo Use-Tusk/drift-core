@@ -25,8 +25,9 @@ crate.
 
 ## Key docs
 
-- Architecture and design: [`docs/design.md`](docs/design.md)
-- Development and release workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- [Architecture and design](docs/design.md)
+- [Compatibility matrix](docs/compatibility-matrix.md)
+- [Development and release workflow](CONTRIBUTING.md)
 
 ## Runtime expectations
 
