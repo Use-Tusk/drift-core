@@ -4,6 +4,12 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build artifacts only; skip publishing to registries"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -20,12 +26,25 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+            wheel_pattern: "*manylinux*x86_64*.whl"
           - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            wheel_pattern: "*musllinux*x86_64*.whl"
+          - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
+            wheel_pattern: "*manylinux*aarch64*.whl"
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            wheel_pattern: "*musllinux*aarch64*.whl"
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+            wheel_pattern: "*macosx*x86_64*.whl"
           - os: macos-14
             target: aarch64-apple-darwin
+            wheel_pattern: "*macosx*arm64*.whl"
           - os: windows-latest
             target: x86_64-pc-windows-msvc
+            wheel_pattern: "*win_amd64*.whl"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,6 +60,18 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --manifest-path bindings/python/Cargo.toml --out dist
           manylinux: auto
+
+      - name: Verify wheel was produced for target
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -la dist
+          pattern="${{ matrix.wheel_pattern }}"
+          wheel_count=$(ls dist/$pattern 2>/dev/null | wc -l | tr -d ' ')
+          if [ "$wheel_count" -eq 0 ]; then
+            echo "Expected wheel matching pattern '$pattern' for target '${{ matrix.target }}', but none was produced."
+            exit 1
+          fi
 
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
@@ -81,6 +112,7 @@ jobs:
 
   publish-python:
     name: Publish Python package (PyPI)
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.dry_run != 'true'
     runs-on: ubuntu-latest
     needs: [build-python-wheels, build-python-sdist]
     permissions:
@@ -107,7 +139,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-14, windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15-intel, macos-14, windows-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -141,6 +173,7 @@ jobs:
 
   publish-node:
     name: Publish Node package (npm)
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.dry_run != 'true'
     runs-on: ubuntu-latest
     needs: build-node-binaries
     steps:
