@@ -71,3 +71,53 @@ jobs:
 
       - name: Run parity smoke suite
         run: bash tests/parity/run_smoke.sh
+
+  node-musl-build:
+    name: Node musl build (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    needs: rust-workspace
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            expected_file: index.linux-x64-musl.node
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            expected_file: index.linux-arm64-musl.node
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: bindings/node/package-lock.json
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.93.1
+          targets: ${{ matrix.target }}
+
+      - name: Install musl toolchain
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Install dependencies
+        working-directory: bindings/node
+        run: npm ci
+
+      - name: Build native addon
+        working-directory: bindings/node
+        run: npm run build -- --target ${{ matrix.target }}
+
+      - name: Verify native addon was produced for target
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -la bindings/node
+          test -f "bindings/node/${{ matrix.expected_file }}"
