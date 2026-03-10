@@ -26,10 +26,11 @@ Source of truth for native artifact coverage.
 | --- | --- | --- |
 | Linux x86_64 (glibc) | prebuilt native addon | Supported |
 | Linux arm64 (glibc) | prebuilt native addon | Supported |
+| Linux x86_64 (musl) | prebuilt native addon | Supported |
+| Linux arm64 (musl) | prebuilt native addon | Supported |
 | macOS x86_64 (Intel) | prebuilt native addon | Supported |
 | macOS arm64 (Apple Silicon) | prebuilt native addon | Supported |
 | Windows x86_64 | prebuilt native addon | Supported |
-| Linux musl targets | no supported prebuild guarantee | Best effort |
 | Windows arm64 | no supported prebuild guarantee | Best effort |
 
 ## Notes
