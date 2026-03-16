@@ -52,19 +52,19 @@ jobs:
           - os: macos-15-intel
             target: x86_64-apple-darwin
             manylinux: "auto"
-            compatibility_args: ""
+            compatibility_args: "--compatibility pypi"
             python_args: ""
             wheel_pattern: "drift_core_python-*-cp39-abi3-macosx*x86_64.whl"
           - os: macos-14
             target: aarch64-apple-darwin
             manylinux: "auto"
-            compatibility_args: ""
+            compatibility_args: "--compatibility pypi"
             python_args: ""
             wheel_pattern: "drift_core_python-*-cp39-abi3-macosx*arm64.whl"
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             manylinux: "auto"
-            compatibility_args: ""
+            compatibility_args: "--compatibility pypi"
             python_args: ""
             wheel_pattern: "drift_core_python-*-cp39-abi3-win_amd64.whl"
     steps:
