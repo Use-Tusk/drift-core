@@ -24,27 +24,42 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # `manylinux` option only applies to glibc-based Linux, ignored on other platforms
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            wheel_pattern: "*manylinux*x86_64*.whl"
+            manylinux: "2_17"
+            python_args: "-i python3.9"
+            wheel_pattern: "drift_core_python-*-cp39-abi3-manylinux*_x86_64.whl"
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            wheel_pattern: "*musllinux*x86_64*.whl"
+            manylinux: "auto"
+            python_args: "-i python3.9"
+            wheel_pattern: "drift_core_python-*-cp39-abi3-musllinux*_x86_64.whl"
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
-            wheel_pattern: "*manylinux*aarch64*.whl"
+            manylinux: "2_17"
+            python_args: "-i python3.9"
+            wheel_pattern: "drift_core_python-*-cp39-abi3-manylinux*_aarch64.whl"
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
-            wheel_pattern: "*musllinux*aarch64*.whl"
+            manylinux: "auto"
+            python_args: "-i python3.9"
+            wheel_pattern: "drift_core_python-*-cp39-abi3-musllinux*_aarch64.whl"
           - os: macos-15-intel
             target: x86_64-apple-darwin
-            wheel_pattern: "*macosx*x86_64*.whl"
+            manylinux: "auto"
+            python_args: ""
+            wheel_pattern: "drift_core_python-*-cp39-abi3-macosx*x86_64.whl"
           - os: macos-14
             target: aarch64-apple-darwin
-            wheel_pattern: "*macosx*arm64*.whl"
+            manylinux: "auto"
+            python_args: ""
+            wheel_pattern: "drift_core_python-*-cp39-abi3-macosx*arm64.whl"
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            wheel_pattern: "*win_amd64*.whl"
+            manylinux: "auto"
+            python_args: ""
+            wheel_pattern: "drift_core_python-*-cp39-abi3-win_amd64.whl"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,11 +70,12 @@ jobs:
           python-version: "3.11"
 
       - name: Build wheel
-        uses: PyO3/maturin-action@v1
+        uses: PyO3/maturin-action@04ac600d27cdf7a9a280dadf7147097c42b757ad # v1.50.1
         with:
+          maturin-version: v1.12.6
           target: ${{ matrix.target }}
-          args: --release --manifest-path bindings/python/Cargo.toml --out dist
-          manylinux: auto
+          args: --release --compatibility pypi --manifest-path bindings/python/Cargo.toml --out dist ${{ matrix.python_args }}
+          manylinux: ${{ matrix.manylinux }}
 
       - name: Verify wheel was produced for target
         shell: bash
