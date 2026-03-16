@@ -28,36 +28,43 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             manylinux: "2_17"
+            compatibility_args: "--compatibility pypi manylinux_2_17"
             python_args: "-i python3.9"
             wheel_pattern: "drift_core_python-*-cp39-abi3-manylinux*_x86_64.whl"
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             manylinux: "auto"
+            compatibility_args: "--compatibility pypi musllinux_1_2"
             python_args: ""
             wheel_pattern: "drift_core_python-*-cp39-abi3-musllinux*_x86_64.whl"
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             manylinux: "2_17"
+            compatibility_args: "--compatibility pypi manylinux_2_17"
             python_args: "-i python3.9"
             wheel_pattern: "drift_core_python-*-cp39-abi3-manylinux*_aarch64.whl"
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
             manylinux: "auto"
+            compatibility_args: "--compatibility pypi musllinux_1_2"
             python_args: ""
             wheel_pattern: "drift_core_python-*-cp39-abi3-musllinux*_aarch64.whl"
           - os: macos-15-intel
             target: x86_64-apple-darwin
             manylinux: "auto"
+            compatibility_args: ""
             python_args: ""
             wheel_pattern: "drift_core_python-*-cp39-abi3-macosx*x86_64.whl"
           - os: macos-14
             target: aarch64-apple-darwin
             manylinux: "auto"
+            compatibility_args: ""
             python_args: ""
             wheel_pattern: "drift_core_python-*-cp39-abi3-macosx*arm64.whl"
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             manylinux: "auto"
+            compatibility_args: ""
             python_args: ""
             wheel_pattern: "drift_core_python-*-cp39-abi3-win_amd64.whl"
     steps:
@@ -74,7 +81,7 @@ jobs:
         with:
           maturin-version: v1.12.6
           target: ${{ matrix.target }}
-          args: --release --compatibility pypi --manifest-path bindings/python/Cargo.toml --out dist ${{ matrix.python_args }}
+          args: --release ${{ matrix.compatibility_args }} --manifest-path bindings/python/Cargo.toml --out dist ${{ matrix.python_args }}
           manylinux: ${{ matrix.manylinux }}
 
       - name: Verify wheel was produced for target
